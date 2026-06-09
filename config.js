@@ -13,5 +13,5 @@ window.FE_CONFIG = {
     templateBoasVindas: "template_6wimgmc",
     templateReset: "TODO_TEMPLATE_RESET"
   },
-  anthropicKey: "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"
+  anthropicKey: "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"
 };
