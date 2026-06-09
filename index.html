@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FitEvolution — Acesso</title>
+
+<!-- Fontes -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<!-- Firebase (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<style>
+  :root{
+    --ink:#17161A; --surface:#F4F4F2; --card:#FFFFFF; --line:#E5E4DF;
+    --accent:#FF4A1C; --accent-dk:#C9360F; --muted:#6E6C72; --ok:#1B7A4B; --err:#C9360F;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:'Inter',system-ui,sans-serif; color:var(--ink); background:var(--surface);
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .display{ font-family:'Bebas Neue',sans-serif; letter-spacing:.02em; line-height:.9; }
+  .eyebrow{ font-weight:700; letter-spacing:.18em; text-transform:uppercase; font-size:11px; }
+  .wrap{ width:100%; max-width:440px; }
+  .brand{ display:flex; align-items:center; gap:11px; justify-content:center; margin-bottom:18px; }
+  .brand .mark{ background:var(--accent); border-radius:11px; width:42px; height:42px; display:flex; align-items:center; justify-content:center; }
+  .brand .mark svg{ width:24px; height:24px; }
+  .brand .name{ font-size:34px; }
+  .brand .name b{ color:var(--accent); }
+  .card{ background:var(--card); border-radius:18px; padding:26px 24px; box-shadow:0 10px 30px rgba(20,18,24,.06); }
+  h1.title{ margin:0 0 4px; font-size:30px; }
+  .sub{ color:var(--muted); font-size:13px; margin:0 0 18px; }
+  label{ display:block; font-size:12px; font-weight:600; color:var(--muted); margin:14px 0 6px; }
+  input{ width:100%; background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px 13px;
+    font-size:14px; font-family:inherit; color:var(--ink); outline:none; transition:border-color .15s, box-shadow .15s; }
+  input:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,74,28,.13); }
+  .row-check{ display:flex; align-items:center; gap:9px; margin-top:14px; }
+  .row-check input{ width:18px; height:18px; accent-color:var(--accent); }
+  .row-check label{ margin:0; font-size:13px; color:var(--ink); font-weight:500; }
+  button.cta{ margin-top:20px; width:100%; background:var(--accent); color:#fff; border:none; border-radius:12px;
+    padding:14px; font-size:15px; font-weight:700; font-family:inherit; cursor:pointer; transition:opacity .15s, transform .08s; }
+  button.cta:hover{ opacity:.93; }
+  button.cta:active{ transform:translateY(1px); }
+  button.cta:disabled{ background:#D8D7D2; color:#9A989E; cursor:not-allowed; }
+  .links{ display:flex; justify-content:space-between; margin-top:16px; font-size:13px; flex-wrap:wrap; gap:8px; }
+  a.link{ color:var(--accent-dk); text-decoration:none; font-weight:600; cursor:pointer; }
+  a.link:hover{ text-decoration:underline; }
+  .msg{ margin-top:14px; font-size:13px; line-height:1.45; display:none; padding:11px 13px; border-radius:10px; }
+  .msg.show{ display:block; }
+  .msg.ok{ background:#EAF7F0; color:var(--ok); }
+  .msg.err{ background:#FFF1ED; color:var(--err); }
+  .view{ display:none; }
+  .view.active{ display:block; }
+  .foot{ text-align:center; color:var(--muted); font-size:11px; margin-top:16px; line-height:1.5; }
+  /* Painel */
+  .painel-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .ola{ font-size:30px; }
+  .sair{ background:var(--surface); border:none; border-radius:10px; padding:9px 13px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <span class="mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#17161A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M3 10l7-7 4 4-7 7zM10 14l7 7"/></svg>
+    </span>
+    <span class="display name">Fit<b>Evolution</b></span>
+  </div>
+
+  <!-- ===================== LOGIN ===================== -->
+  <div id="view-login" class="view active">
+    <div class="card">
+      <div class="eyebrow" style="color:var(--accent-dk)">Acesso do aluno</div>
+      <h1 class="title display">ENTRAR</h1>
+      <p class="sub">Use seu e-mail e a senha que recebeu por e-mail.</p>
+
+      <label>E-mail</label>
+      <input id="login-email" type="email" placeholder="seu@email.com" autocomplete="username" />
+      <label>Senha</label>
+      <input id="login-senha" type="password" placeholder="Sua senha" autocomplete="current-password" />
+
+      <div class="row-check">
+        <input id="login-auto" type="checkbox" />
+        <label for="login-auto">Manter conectado neste dispositivo</label>
+      </div>
+
+      <button class="cta" id="btn-login">Entrar</button>
+      <div id="msg-login" class="msg"></div>
+
+      <div class="links">
+        <a class="link" data-go="esqueci">Esqueci minha senha</a>
+        <a class="link" data-go="criar">Criar acesso</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CRIAR ACESSO ===================== -->
+  <div id="view-criar" class="view">
+    <div class="card">
+      <div class="eyebrow" style="color:var(--accent-dk)">Novo aluno</div>
+      <h1 class="title display">CRIAR ACESSO</h1>
+      <p class="sub">Preencha os dados. Sua senha inicial será enviada por e-mail.</p>
+
+      <label>Nome completo</label>
+      <input id="c-nome" type="text" placeholder="Ex: João da Silva" />
+      <label>CPF</label>
+      <input id="c-cpf" type="text" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" />
+      <label>Data de nascimento</label>
+      <input id="c-nasc" type="date" />
+      <label>E-mail</label>
+      <input id="c-email" type="email" placeholder="seu@email.com" />
+
+      <button class="cta" id="btn-criar">Criar acesso e enviar senha</button>
+      <div id="msg-criar" class="msg"></div>
+
+      <div class="links">
+        <a class="link" data-go="login">Já tenho acesso</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ESQUECI A SENHA ===================== -->
+  <div id="view-esqueci" class="view">
+    <div class="card">
+      <div class="eyebrow" style="color:var(--accent-dk)">Recuperação</div>
+      <h1 class="title display">REDEFINIR SENHA</h1>
+      <p class="sub">Informe seu e-mail. Enviaremos um link para criar uma nova senha.</p>
+
+      <label>E-mail</label>
+      <input id="e-email" type="email" placeholder="seu@email.com" />
+
+      <button class="cta" id="btn-esqueci">Enviar link de redefinição</button>
+      <div id="msg-esqueci" class="msg"></div>
+
+      <div class="links">
+        <a class="link" data-go="login">Voltar ao login</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== NOVA SENHA (via link) ===================== -->
+  <div id="view-reset" class="view">
+    <div class="card">
+      <div class="eyebrow" style="color:var(--accent-dk)">Nova senha</div>
+      <h1 class="title display">CRIAR NOVA SENHA</h1>
+      <p class="sub">Escolha uma senha com pelo menos 6 caracteres.</p>
+
+      <label>Nova senha</label>
+      <input id="r-senha" type="password" placeholder="Nova senha" autocomplete="new-password" />
+      <label>Confirmar nova senha</label>
+      <input id="r-senha2" type="password" placeholder="Repita a senha" autocomplete="new-password" />
+
+      <button class="cta" id="btn-reset">Salvar nova senha</button>
+      <div id="msg-reset" class="msg"></div>
+    </div>
+  </div>
+
+  <!-- ===================== PAINEL (logado) ===================== -->
+  <div id="view-painel" class="view">
+    <div class="card">
+      <div class="painel-top">
+        <div>
+          <div class="eyebrow" style="color:var(--accent-dk)">Conectado</div>
+          <div class="display ola">OLÁ, <span id="p-nome">ALUNO</span></div>
+        </div>
+        <button class="sair" id="btn-sair">Sair</button>
+      </div>
+      <p class="sub" style="margin-top:6px">Seu acesso ao FitEvolution está ativo. Em breve, seu treino personalizado aparece aqui.</p>
+
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer; font-weight:600; font-size:13px; color:var(--accent-dk)">Trocar minha senha</summary>
+        <label>Nova senha</label>
+        <input id="t-senha" type="password" placeholder="Nova senha" autocomplete="new-password" />
+        <label>Confirmar</label>
+        <input id="t-senha2" type="password" placeholder="Repita a senha" autocomplete="new-password" />
+        <button class="cta" id="btn-trocar" style="margin-top:14px">Atualizar senha</button>
+        <div id="msg-trocar" class="msg"></div>
+      </details>
+    </div>
+  </div>
+
+  <p class="foot">FitEvolution • Acesso seguro do aluno</p>
+</div>
+
+<!-- Configuração externa (mantida fora do código-fonte / .gitignore) -->
+<script src="config.js"></script>
+
+<script>
+/* ============================================================
+   CONFIGURAÇÃO — lida do config.js (window.FE_CONFIG)
+   ============================================================ */
+const CFG = window.FE_CONFIG;
+if(!CFG || !CFG.firebase){
+  alert("Arquivo config.js não encontrado. Coloque-o na mesma pasta deste HTML.");
+}
+const firebaseConfig              = CFG.firebase;
+const EMAILJS_PUBLIC_KEY          = CFG.emailjs.publicKey;
+const EMAILJS_SERVICE_ID          = CFG.emailjs.serviceId;
+const EMAILJS_TEMPLATE_BOASVINDAS = CFG.emailjs.templateBoasVindas;
+const EMAILJS_TEMPLATE_RESET      = CFG.emailjs.templateReset;
+
+/* ============================================================
+   INICIALIZAÇÃO
+   ============================================================ */
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const alunos = db.collection("alunos");
+emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+const URL_SISTEMA = location.origin + location.pathname;
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+// localStorage tolerante (não quebra em ambientes restritos)
+const LS = {
+  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
+  del(k){ try { localStorage.removeItem(k); } catch(e){} }
+};
+
+async function hash(txt){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+function soDigitos(s){ return (s||"").replace(/\D/g,""); }
+
+function cpfValido(cpf){
+  cpf = soDigitos(cpf);
+  if(cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+  let s=0; for(let i=0;i<9;i++) s += parseInt(cpf[i])*(10-i);
+  let d1=(s*10)%11; if(d1===10) d1=0; if(d1 !== parseInt(cpf[9])) return false;
+  s=0; for(let i=0;i<10;i++) s += parseInt(cpf[i])*(11-i);
+  let d2=(s*10)%11; if(d2===10) d2=0; return d2 === parseInt(cpf[10]);
+}
+
+function emailValido(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+function mascaraCPF(v){
+  v = soDigitos(v).slice(0,11);
+  return v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");
+}
+
+function token(){
+  const a = new Uint8Array(16); crypto.getRandomValues(a);
+  return [...a].map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+function $(id){ return document.getElementById(id); }
+
+function showView(name){
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  $("view-" + name).classList.add("active");
+}
+
+function msg(id, texto, tipo){
+  const el = $(id);
+  el.textContent = texto;
+  el.className = "msg show " + (tipo || "");
+}
+function limpaMsg(id){ $(id).className = "msg"; }
+
+function carregando(btn, on, textoOriginal){
+  btn.disabled = on;
+  if(on){ btn.dataset.txt = btn.textContent; btn.textContent = "Aguarde..."; }
+  else  { btn.textContent = btn.dataset.txt || textoOriginal; }
+}
+
+/* ============================================================
+   CRIAR ACESSO
+   ============================================================ */
+async function criarAcesso(){
+  const btn = $("btn-criar");
+  limpaMsg("msg-criar");
+  const nome = $("c-nome").value.trim();
+  const cpf  = soDigitos($("c-cpf").value);
+  const nasc = $("c-nasc").value;
+  const email = $("c-email").value.trim().toLowerCase();
+
+  if(!nome || nome.split(" ").length < 2) return msg("msg-criar","Informe o nome completo.","err");
+  if(!cpfValido(cpf)) return msg("msg-criar","CPF inválido. Confira os números.","err");
+  if(!nasc) return msg("msg-criar","Informe a data de nascimento.","err");
+  if(!emailValido(email)) return msg("msg-criar","E-mail inválido.","err");
+
+  carregando(btn, true);
+  try {
+    // CPF é o identificador (evita duplicidade)
+    const ref = alunos.doc(cpf);
+    if((await ref.get()).exists) { carregando(btn,false); return msg("msg-criar","Já existe um acesso com este CPF.","err"); }
+    // e-mail único
+    const dupEmail = await alunos.where("email","==",email).limit(1).get();
+    if(!dupEmail.empty) { carregando(btn,false); return msg("msg-criar","Este e-mail já está em uso.","err"); }
+
+    // Senha inicial = CPF (somente números). Guardamos só o hash.
+    const senhaInicial = cpf;
+    await ref.set({
+      nome, cpf, dataNascimento: nasc, email,
+      senhaHash: await hash(senhaInicial),
+      senhaPadraoCpf: true,
+      ativo: true,
+      criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // E-mail de boas-vindas com a senha
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_BOASVINDAS, {
+      to_name: nome,
+      to_email: email,
+      login_email: email,
+      senha: senhaInicial,        // CPF, somente números
+      link_sistema: URL_SISTEMA
+    });
+
+    carregando(btn,false);
+    msg("msg-criar","Acesso criado! Enviamos sua senha para " + email + ".","ok");
+    ["c-nome","c-cpf","c-nasc","c-email"].forEach(i => $(i).value = "");
+    setTimeout(() => showView("login"), 2200);
+  } catch(err){
+    console.error(err);
+    carregando(btn,false);
+    msg("msg-criar","Erro ao criar acesso. Tente novamente.","err");
+  }
+}
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+async function entrar(){
+  const btn = $("btn-login");
+  limpaMsg("msg-login");
+  const email = $("login-email").value.trim().toLowerCase();
+  const senha = $("login-senha").value;
+  if(!emailValido(email) || !senha) return msg("msg-login","Informe e-mail e senha.","err");
+
+  carregando(btn, true);
+  try {
+    const q = await alunos.where("email","==",email).limit(1).get();
+    if(q.empty){ carregando(btn,false); return msg("msg-login","E-mail ou senha incorretos.","err"); }
+    const doc = q.docs[0];
+    const dados = doc.data();
+    if(dados.senhaHash !== await hash(senha)){ carregando(btn,false); return msg("msg-login","E-mail ou senha incorretos.","err"); }
+    if(dados.ativo === false){ carregando(btn,false); return msg("msg-login","Acesso desativado. Procure a recepção.","err"); }
+
+    if($("login-auto").checked) LS.set("fe_sessao", doc.id);
+    carregando(btn,false);
+    abrirPainel(dados);
+  } catch(err){
+    console.error(err);
+    carregando(btn,false);
+    msg("msg-login","Erro ao entrar. Tente novamente.","err");
+  }
+}
+
+function abrirPainel(dados){
+  $("p-nome").textContent = (dados.nome || "aluno").split(" ")[0].toUpperCase();
+  window._alunoAtual = dados;
+  showView("painel");
+}
+
+function sair(){
+  LS.del("fe_sessao");
+  window._alunoAtual = null;
+  $("login-senha").value = "";
+  showView("login");
+}
+
+/* ============================================================
+   ESQUECI A SENHA → envia link via EmailJS
+   ============================================================ */
+async function enviarReset(){
+  const btn = $("btn-esqueci");
+  limpaMsg("msg-esqueci");
+  const email = $("e-email").value.trim().toLowerCase();
+  if(!emailValido(email)) return msg("msg-esqueci","E-mail inválido.","err");
+
+  carregando(btn, true);
+  try {
+    const q = await alunos.where("email","==",email).limit(1).get();
+    if(!q.empty){
+      const doc = q.docs[0];
+      const tk = token();
+      const expira = Date.now() + 60*60*1000; // 1 hora
+      await doc.ref.update({ resetToken: tk, resetExpira: expira });
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_RESET, {
+        to_name: doc.data().nome,
+        to_email: email,
+        link_reset: URL_SISTEMA + "?reset=" + tk
+      });
+    }
+    // Mensagem genérica (não revela se o e-mail existe)
+    carregando(btn,false);
+    msg("msg-esqueci","Se este e-mail estiver cadastrado, enviamos um link de redefinição.","ok");
+  } catch(err){
+    console.error(err);
+    carregando(btn,false);
+    msg("msg-esqueci","Erro ao enviar. Tente novamente.","err");
+  }
+}
+
+/* ============================================================
+   REDEFINIR SENHA (via link com ?reset=TOKEN)
+   ============================================================ */
+let _resetToken = null;
+
+async function redefinirSenha(){
+  const btn = $("btn-reset");
+  limpaMsg("msg-reset");
+  const s1 = $("r-senha").value, s2 = $("r-senha2").value;
+  if(s1.length < 6) return msg("msg-reset","A senha deve ter ao menos 6 caracteres.","err");
+  if(s1 !== s2) return msg("msg-reset","As senhas não conferem.","err");
+
+  carregando(btn, true);
+  try {
+    const q = await alunos.where("resetToken","==",_resetToken).limit(1).get();
+    if(q.empty){ carregando(btn,false); return msg("msg-reset","Link inválido. Solicite um novo.","err"); }
+    const doc = q.docs[0];
+    if(!doc.data().resetExpira || doc.data().resetExpira < Date.now()){
+      carregando(btn,false); return msg("msg-reset","Link expirado. Solicite um novo.","err");
+    }
+    await doc.ref.update({
+      senhaHash: await hash(s1),
+      senhaPadraoCpf: false,
+      resetToken: firebase.firestore.FieldValue.delete(),
+      resetExpira: firebase.firestore.FieldValue.delete()
+    });
+    carregando(btn,false);
+    msg("msg-reset","Senha atualizada! Você já pode entrar.","ok");
+    history.replaceState(null,"",URL_SISTEMA);
+    setTimeout(() => showView("login"), 2000);
+  } catch(err){
+    console.error(err);
+    carregando(btn,false);
+    msg("msg-reset","Erro ao salvar. Tente novamente.","err");
+  }
+}
+
+/* ============================================================
+   TROCAR SENHA (logado)
+   ============================================================ */
+async function trocarSenha(){
+  const btn = $("btn-trocar");
+  limpaMsg("msg-trocar");
+  const s1 = $("t-senha").value, s2 = $("t-senha2").value;
+  if(!window._alunoAtual) return;
+  if(s1.length < 6) return msg("msg-trocar","A senha deve ter ao menos 6 caracteres.","err");
+  if(s1 !== s2) return msg("msg-trocar","As senhas não conferem.","err");
+  carregando(btn, true);
+  try {
+    await alunos.doc(window._alunoAtual.cpf).update({ senhaHash: await hash(s1), senhaPadraoCpf:false });
+    carregando(btn,false);
+    msg("msg-trocar","Senha atualizada com sucesso.","ok");
+    $("t-senha").value = $("t-senha2").value = "";
+  } catch(err){
+    console.error(err);
+    carregando(btn,false);
+    msg("msg-trocar","Erro ao atualizar. Tente novamente.","err");
+  }
+}
+
+/* ============================================================
+   ROTEAMENTO INICIAL + EVENTOS
+   ============================================================ */
+async function init(){
+  // Link de reset?
+  const params = new URLSearchParams(location.search);
+  const tk = params.get("reset");
+  if(tk){ _resetToken = tk; showView("reset"); return; }
+
+  // Login automático?
+  const sessao = LS.get("fe_sessao");
+  if(sessao){
+    try {
+      const snap = await alunos.doc(sessao).get();
+      if(snap.exists && snap.data().ativo !== false){ abrirPainel(snap.data()); return; }
+      LS.del("fe_sessao");
+    } catch(e){ /* segue para login */ }
+  }
+  showView("login");
+}
+
+// Navegação entre telas
+document.querySelectorAll("[data-go]").forEach(a =>
+  a.addEventListener("click", () => { limpaMsgs(); showView(a.dataset.go); })
+);
+function limpaMsgs(){ ["msg-login","msg-criar","msg-esqueci","msg-reset"].forEach(limpaMsg); }
+
+// Máscara de CPF
+$("c-cpf").addEventListener("input", e => { e.target.value = mascaraCPF(e.target.value); });
+
+// Botões
+$("btn-criar").addEventListener("click", criarAcesso);
+$("btn-login").addEventListener("click", entrar);
+$("btn-esqueci").addEventListener("click", enviarReset);
+$("btn-reset").addEventListener("click", redefinirSenha);
+$("btn-trocar").addEventListener("click", trocarSenha);
+$("btn-sair").addEventListener("click", sair);
+
+// Enter envia o formulário da tela ativa
+document.addEventListener("keydown", e => {
+  if(e.key !== "Enter") return;
+  const v = document.querySelector(".view.active").id;
+  ({ "view-login":entrar, "view-criar":criarAcesso, "view-esqueci":enviarReset, "view-reset":redefinirSenha })[v]?.();
+});
+
+init();
+</script>
+</body>
+</html>
