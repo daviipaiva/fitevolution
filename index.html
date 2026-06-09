@@ -308,14 +308,21 @@ async function criarAcesso(){
       criadoEm: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // E-mail de boas-vindas com a senha
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_BOASVINDAS, {
-      to_name: nome,
-      to_email: email,
-      login_email: email,
-      senha: senhaInicial,        // CPF, somente números
-      link_sistema: URL_SISTEMA
-    });
+    // E-mail de boas-vindas com a senha (se falhar, desfaz o cadastro p/ permitir nova tentativa)
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_BOASVINDAS, {
+        to_name: nome,
+        to_email: email,
+        login_email: email,
+        senha: senhaInicial,        // CPF, somente números
+        link_sistema: URL_SISTEMA
+      });
+    } catch(mailErr){
+      console.error("Falha no EmailJS:", mailErr);
+      await ref.delete().catch(() => {});
+      carregando(btn,false);
+      return msg("msg-criar","Cadastro não concluído: falha ao enviar o e-mail. Confira o template no EmailJS e tente novamente.","err");
+    }
 
     carregando(btn,false);
     msg("msg-criar","Acesso criado! Enviamos sua senha para " + email + ".","ok");
