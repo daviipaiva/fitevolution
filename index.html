@@ -5,94 +5,191 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>FitEvolution — Acesso</title>
 
-<!-- Fontes -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-<!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-<!-- EmailJS -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <style>
-  :root{
-    --ink:#17161A; --surface:#F4F4F2; --card:#FFFFFF; --line:#E5E4DF;
-    --accent:#FF4A1C; --accent-dk:#C9360F; --muted:#6E6C72; --ok:#1B7A4B; --err:#C9360F;
-  }
-  *{ box-sizing:border-box; }
-  body{ margin:0; font-family:'Inter',system-ui,sans-serif; color:var(--ink); background:var(--surface);
-    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
-  .display{ font-family:'Bebas Neue',sans-serif; letter-spacing:.02em; line-height:.9; }
-  .eyebrow{ font-weight:700; letter-spacing:.18em; text-transform:uppercase; font-size:11px; }
-  .wrap{ width:100%; max-width:440px; }
-  .brand{ display:flex; align-items:center; gap:11px; justify-content:center; margin-bottom:18px; }
-  .brand .mark{ background:var(--accent); border-radius:11px; width:42px; height:42px; display:flex; align-items:center; justify-content:center; }
-  .brand .mark svg{ width:24px; height:24px; }
-  .brand .name{ font-size:34px; }
-  .brand .name b{ color:var(--accent); }
-  .card{ background:var(--card); border-radius:18px; padding:26px 24px; box-shadow:0 10px 30px rgba(20,18,24,.06); }
-  h1.title{ margin:0 0 4px; font-size:30px; }
-  .sub{ color:var(--muted); font-size:13px; margin:0 0 18px; }
-  label{ display:block; font-size:12px; font-weight:600; color:var(--muted); margin:14px 0 6px; }
-  input{ width:100%; background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px 13px;
-    font-size:14px; font-family:inherit; color:var(--ink); outline:none; transition:border-color .15s, box-shadow .15s; }
-  input:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,74,28,.13); }
-  .row-check{ display:flex; align-items:center; gap:9px; margin-top:14px; }
-  .row-check input{ width:18px; height:18px; accent-color:var(--accent); }
-  .row-check label{ margin:0; font-size:13px; color:var(--ink); font-weight:500; }
-  button.cta{ margin-top:20px; width:100%; background:var(--accent); color:#fff; border:none; border-radius:12px;
-    padding:14px; font-size:15px; font-weight:700; font-family:inherit; cursor:pointer; transition:opacity .15s, transform .08s; }
-  button.cta:hover{ opacity:.93; }
-  button.cta:active{ transform:translateY(1px); }
-  button.cta:disabled{ background:#D8D7D2; color:#9A989E; cursor:not-allowed; }
-  .links{ display:flex; justify-content:space-between; margin-top:16px; font-size:13px; flex-wrap:wrap; gap:8px; }
-  a.link{ color:var(--accent-dk); text-decoration:none; font-weight:600; cursor:pointer; }
-  a.link:hover{ text-decoration:underline; }
-  .msg{ margin-top:14px; font-size:13px; line-height:1.45; display:none; padding:11px 13px; border-radius:10px; }
-  .msg.show{ display:block; }
-  .msg.ok{ background:#EAF7F0; color:var(--ok); }
-  .msg.err{ background:#FFF1ED; color:var(--err); }
-  .view{ display:none; }
-  .view.active{ display:block; }
-  .foot{ text-align:center; color:var(--muted); font-size:11px; margin-top:16px; line-height:1.5; }
-  /* Painel */
-  .painel-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-  .ola{ font-size:30px; }
-  .sair{ background:var(--surface); border:none; border-radius:10px; padding:9px 13px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+:root{
+  --ink:#17161A; --surface:#F4F4F2; --card:#FFFFFF; --line:#E5E4DF;
+  --accent:#FF4A1C; --accent-dk:#C9360F; --accent-lt:#FFF1ED;
+  --muted:#6E6C72; --ok:#1B7A4B; --ok-bg:#EAF7F0; --err:#C9360F; --err-bg:#FFF1ED;
+  --progress:#FF4A1C;
+}
+*{ box-sizing:border-box; }
+body{ margin:0; font-family:'Inter',system-ui,sans-serif; color:var(--ink);
+  background:var(--surface); min-height:100vh; display:flex; align-items:center;
+  justify-content:center; padding:24px; }
+.display{ font-family:'Bebas Neue',sans-serif; letter-spacing:.02em; line-height:.9; }
+.eyebrow{ font-weight:700; letter-spacing:.18em; text-transform:uppercase; font-size:11px; }
+
+/* ── Layout wrap ── */
+.wrap{ width:100%; max-width:480px; }
+
+/* ── Brand ── */
+.brand{ display:flex; align-items:center; gap:11px; justify-content:center; margin-bottom:18px; }
+.brand .mark{ background:var(--accent); border-radius:11px; width:42px; height:42px; display:flex; align-items:center; justify-content:center; }
+.brand .mark svg{ width:24px; height:24px; }
+.brand .name{ font-size:34px; }
+.brand .name b{ color:var(--accent); }
+
+/* ── Card ── */
+.card{ background:var(--card); border-radius:18px; padding:28px 26px; box-shadow:0 10px 30px rgba(20,18,24,.07); }
+
+/* ── Tipografia de tela ── */
+h1.title{ margin:0 0 4px; font-size:30px; }
+.sub{ color:var(--muted); font-size:13px; margin:0 0 18px; line-height:1.5; }
+
+/* ── Campos ── */
+label{ display:block; font-size:12px; font-weight:600; color:var(--muted); margin:14px 0 6px; }
+input[type=text],input[type=email],input[type=password],input[type=date],
+input[type=number],select,textarea{
+  width:100%; background:#fff; border:1px solid var(--line); border-radius:10px;
+  padding:11px 13px; font-size:14px; font-family:inherit; color:var(--ink);
+  outline:none; transition:border-color .15s, box-shadow .15s; appearance:none; }
+input:focus,select:focus,textarea:focus{
+  border-color:var(--accent); box-shadow:0 0 0 3px rgba(255,74,28,.13); }
+textarea{ resize:vertical; min-height:80px; }
+select{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236E6C72' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 13px center; padding-right:32px; }
+
+/* ── Checkbox/Radio ── */
+.row-check{ display:flex; align-items:center; gap:9px; margin-top:12px; }
+.row-check input{ width:18px; height:18px; accent-color:var(--accent); flex-shrink:0; }
+.row-check label{ margin:0; font-size:13px; color:var(--ink); font-weight:500; }
+
+.chip-group{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+.chip{ display:flex; align-items:center; gap:6px; padding:8px 13px; border:1.5px solid var(--line);
+  border-radius:40px; font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; user-select:none; }
+.chip input{ display:none; }
+.chip:has(input:checked){ background:var(--accent); color:#fff; border-color:var(--accent); }
+.chip:hover{ border-color:var(--accent); }
+
+/* ── Botão primário ── */
+button.cta{ margin-top:20px; width:100%; background:var(--accent); color:#fff; border:none;
+  border-radius:12px; padding:14px; font-size:15px; font-weight:700; font-family:inherit;
+  cursor:pointer; transition:opacity .15s, transform .08s; display:flex; align-items:center; justify-content:center; gap:8px; }
+button.cta:hover{ opacity:.93; }
+button.cta:active{ transform:translateY(1px); }
+button.cta:disabled{ background:#D8D7D2; color:#9A989E; cursor:not-allowed; }
+
+/* ── Links ── */
+.links{ display:flex; justify-content:space-between; margin-top:16px; font-size:13px; flex-wrap:wrap; gap:8px; }
+a.link{ color:var(--accent-dk); text-decoration:none; font-weight:600; cursor:pointer; }
+a.link:hover{ text-decoration:underline; }
+
+/* ── Mensagens ── */
+.msg{ margin-top:14px; font-size:13px; line-height:1.45; display:none; padding:11px 13px; border-radius:10px; }
+.msg.show{ display:block; }
+.msg.ok{ background:var(--ok-bg); color:var(--ok); }
+.msg.err{ background:var(--err-bg); color:var(--err); }
+
+/* ── Views ── */
+.view{ display:none; }
+.view.active{ display:block; }
+
+/* ── Footer ── */
+.foot{ text-align:center; color:var(--muted); font-size:11px; margin-top:16px; line-height:1.5; }
+
+/* ── Progress bar (anamnese) ── */
+.prog-wrap{ margin-bottom:22px; }
+.prog-label{ display:flex; justify-content:space-between; font-size:12px; font-weight:600;
+  color:var(--muted); margin-bottom:7px; }
+.prog-bar{ height:5px; background:var(--line); border-radius:99px; overflow:hidden; }
+.prog-fill{ height:100%; background:var(--accent); border-radius:99px; transition:width .3s ease; }
+
+/* ── Step anamnese ── */
+.step{ display:none; }
+.step.active{ display:block; }
+.step-nav{ display:flex; justify-content:space-between; gap:10px; margin-top:24px; }
+.step-nav button{ flex:1; }
+button.sec{ background:var(--surface); color:var(--ink); border:1.5px solid var(--line); border-radius:12px;
+  padding:13px; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer;
+  transition:background .15s, border-color .15s; margin-top:0; width:auto; }
+button.sec:hover{ background:#ECEAE5; border-color:#C8C6C0; }
+
+/* ── Painel ── */
+.painel-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.ola{ font-size:30px; }
+.sair{ background:var(--surface); border:none; border-radius:10px; padding:9px 13px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+
+/* ── Badge status ── */
+.badge{ display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:40px; font-size:12px; font-weight:600; }
+.badge.pago{ background:var(--ok-bg); color:var(--ok); }
+.badge.pendente{ background:#FFF8E1; color:#8A6B00; }
+
+/* ── Pagamento ── */
+.pay-card{ border:2px solid var(--line); border-radius:14px; padding:20px; margin-top:16px; text-align:center; }
+.pay-price{ font-size:48px; font-family:'Bebas Neue',sans-serif; letter-spacing:.02em; color:var(--accent); line-height:1; }
+.pay-price span{ font-size:22px; vertical-align:top; margin-top:8px; display:inline-block; }
+.pay-desc{ font-size:13px; color:var(--muted); margin:6px 0 0; }
+.pay-items{ text-align:left; margin:16px 0; display:flex; flex-direction:column; gap:8px; }
+.pay-item{ display:flex; align-items:center; gap:9px; font-size:13px; }
+.pay-item svg{ flex-shrink:0; }
+
+/* ── Treino ── */
+.treino-wrap{ margin-top:20px; }
+.treino-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.treino-title{ font-size:20px; }
+button.regenerar{ background:none; border:1.5px solid var(--line); border-radius:10px; padding:8px 13px;
+  font-size:12px; font-weight:600; font-family:inherit; cursor:pointer; display:flex; align-items:center; gap:6px; }
+button.regenerar:hover{ background:var(--surface); }
+.treino-content{ font-size:13px; line-height:1.7; color:var(--ink); white-space:pre-wrap;
+  background:var(--surface); border-radius:12px; padding:16px; border:1px solid var(--line); min-height:100px; }
+.treino-loading{ display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:12px; padding:40px 20px; color:var(--muted); font-size:13px; }
+.spinner{ width:28px; height:28px; border:3px solid var(--line); border-top-color:var(--accent);
+  border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* ── Editar anamnese (accordion) ── */
+details.acc summary{ cursor:pointer; font-weight:600; font-size:13px; color:var(--accent-dk);
+  list-style:none; display:flex; align-items:center; gap:6px; padding:12px 0; border-top:1px solid var(--line); }
+details.acc summary::before{ content:"▸"; font-size:10px; transition:transform .2s; }
+details.acc[open] summary::before{ transform:rotate(90deg); }
+details.acc summary::-webkit-details-marker{ display:none; }
+
+/* ── Senha (accordion) ── */
+details.acc .acc-body{ padding-bottom:4px; }
+
+/* ── Range ── */
+input[type=range]{ padding:0; border:none; box-shadow:none; accent-color:var(--accent); height:24px; }
+input[type=range]:focus{ box-shadow:none; border:none; }
+.range-labels{ display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-top:2px; }
 </style>
 </head>
 <body>
 <div class="wrap">
 
+  <!-- Brand -->
   <div class="brand">
     <span class="mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#17161A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M3 10l7-7 4 4-7 7zM10 14l7 7"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#17161A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M3 10l7-7 4 4-7 7zM10 14l7 7"/>
+      </svg>
     </span>
     <span class="display name">Fit<b>Evolution</b></span>
   </div>
 
-  <!-- ===================== LOGIN ===================== -->
+  <!-- ═══════════════ LOGIN ═══════════════ -->
   <div id="view-login" class="view active">
     <div class="card">
       <div class="eyebrow" style="color:var(--accent-dk)">Acesso do aluno</div>
       <h1 class="title display">ENTRAR</h1>
       <p class="sub">Use seu e-mail e a senha que recebeu por e-mail.</p>
-
       <label>E-mail</label>
       <input id="login-email" type="email" placeholder="seu@email.com" autocomplete="username" />
       <label>Senha</label>
       <input id="login-senha" type="password" placeholder="Sua senha" autocomplete="current-password" />
-
       <div class="row-check">
         <input id="login-auto" type="checkbox" />
         <label for="login-auto">Manter conectado neste dispositivo</label>
       </div>
-
       <button class="cta" id="btn-login">Entrar</button>
       <div id="msg-login" class="msg"></div>
-
       <div class="links">
         <a class="link" data-go="esqueci">Esqueci minha senha</a>
         <a class="link" data-go="criar">Criar acesso</a>
@@ -100,13 +197,12 @@
     </div>
   </div>
 
-  <!-- ===================== CRIAR ACESSO ===================== -->
+  <!-- ═══════════════ CRIAR ACESSO ═══════════════ -->
   <div id="view-criar" class="view">
     <div class="card">
       <div class="eyebrow" style="color:var(--accent-dk)">Novo aluno</div>
       <h1 class="title display">CRIAR ACESSO</h1>
       <p class="sub">Preencha os dados. Sua senha inicial será enviada por e-mail.</p>
-
       <label>Nome completo</label>
       <input id="c-nome" type="text" placeholder="Ex: João da Silva" />
       <label>CPF</label>
@@ -115,53 +211,178 @@
       <input id="c-nasc" type="date" />
       <label>E-mail</label>
       <input id="c-email" type="email" placeholder="seu@email.com" />
-
       <button class="cta" id="btn-criar">Criar acesso e enviar senha</button>
       <div id="msg-criar" class="msg"></div>
-
       <div class="links">
         <a class="link" data-go="login">Já tenho acesso</a>
       </div>
     </div>
   </div>
 
-  <!-- ===================== ESQUECI A SENHA ===================== -->
+  <!-- ═══════════════ ESQUECI ═══════════════ -->
   <div id="view-esqueci" class="view">
     <div class="card">
       <div class="eyebrow" style="color:var(--accent-dk)">Recuperação</div>
       <h1 class="title display">REDEFINIR SENHA</h1>
       <p class="sub">Informe seu e-mail. Enviaremos um link para criar uma nova senha.</p>
-
       <label>E-mail</label>
       <input id="e-email" type="email" placeholder="seu@email.com" />
-
       <button class="cta" id="btn-esqueci">Enviar link de redefinição</button>
       <div id="msg-esqueci" class="msg"></div>
-
       <div class="links">
         <a class="link" data-go="login">Voltar ao login</a>
       </div>
     </div>
   </div>
 
-  <!-- ===================== NOVA SENHA (via link) ===================== -->
+  <!-- ═══════════════ NOVA SENHA (link) ═══════════════ -->
   <div id="view-reset" class="view">
     <div class="card">
       <div class="eyebrow" style="color:var(--accent-dk)">Nova senha</div>
       <h1 class="title display">CRIAR NOVA SENHA</h1>
       <p class="sub">Escolha uma senha com pelo menos 6 caracteres.</p>
-
       <label>Nova senha</label>
       <input id="r-senha" type="password" placeholder="Nova senha" autocomplete="new-password" />
       <label>Confirmar nova senha</label>
       <input id="r-senha2" type="password" placeholder="Repita a senha" autocomplete="new-password" />
-
       <button class="cta" id="btn-reset">Salvar nova senha</button>
       <div id="msg-reset" class="msg"></div>
     </div>
   </div>
 
-  <!-- ===================== PAINEL (logado) ===================== -->
+  <!-- ═══════════════ ANAMNESE ═══════════════ -->
+  <div id="view-anamnese" class="view">
+    <div class="card">
+      <div class="eyebrow" style="color:var(--accent-dk)">Ficha de avaliação</div>
+      <h1 class="title display">VAMOS TE CONHECER</h1>
+      <p class="sub">Preencha abaixo para que a IA monte seu treino personalizado. Leva menos de 2 minutos.</p>
+
+      <!-- Barra de progresso -->
+      <div class="prog-wrap">
+        <div class="prog-label">
+          <span id="step-label">Etapa 1 de 5</span>
+          <span id="step-name">Objetivo</span>
+        </div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:20%"></div></div>
+      </div>
+
+      <!-- STEP 1 — Objetivo -->
+      <div class="step active" id="step-1">
+        <p style="font-size:14px; font-weight:600; margin:0 0 12px">Qual é o seu principal objetivo?</p>
+        <div class="chip-group" id="obj-group">
+          <label class="chip"><input type="radio" name="objetivo" value="Perda de peso / emagrecimento"> Perda de peso</label>
+          <label class="chip"><input type="radio" name="objetivo" value="Ganho de massa muscular (hipertrofia)"> Hipertrofia</label>
+          <label class="chip"><input type="radio" name="objetivo" value="Condicionamento físico e saúde geral"> Condicionamento</label>
+          <label class="chip"><input type="radio" name="objetivo" value="Força e potência"> Força</label>
+          <label class="chip"><input type="radio" name="objetivo" value="Flexibilidade e mobilidade"> Mobilidade</label>
+          <label class="chip"><input type="radio" name="objetivo" value="Resistência (endurance)"> Resistência</label>
+        </div>
+      </div>
+
+      <!-- STEP 2 — Nível -->
+      <div class="step" id="step-2">
+        <p style="font-size:14px; font-weight:600; margin:0 0 12px">Qual é o seu nível de experiência?</p>
+        <div class="chip-group">
+          <label class="chip"><input type="radio" name="nivel" value="Iniciante (menos de 6 meses treinando)"> Iniciante</label>
+          <label class="chip"><input type="radio" name="nivel" value="Intermediário (6 meses a 2 anos)"> Intermediário</label>
+          <label class="chip"><input type="radio" name="nivel" value="Avançado (mais de 2 anos com consistência)"> Avançado</label>
+        </div>
+        <label style="margin-top:18px">Peso atual (kg)</label>
+        <input id="a-peso" type="number" placeholder="Ex: 75" min="30" max="250" />
+        <label>Altura (cm)</label>
+        <input id="a-altura" type="number" placeholder="Ex: 175" min="100" max="230" />
+      </div>
+
+      <!-- STEP 3 — Disponibilidade -->
+      <div class="step" id="step-3">
+        <p style="font-size:14px; font-weight:600; margin:0 0 6px">Quantos dias por semana você pode treinar?</p>
+        <input type="range" id="a-dias" min="2" max="6" value="3" step="1" style="width:100%"/>
+        <div class="range-labels">
+          <span>2 dias</span><span>3</span><span>4</span><span>5</span><span>6 dias</span>
+        </div>
+        <p id="dias-label" style="font-size:13px; color:var(--accent-dk); font-weight:700; margin:8px 0 18px; text-align:center">3 dias por semana</p>
+
+        <p style="font-size:14px; font-weight:600; margin:0 0 12px">Duração média de cada sessão:</p>
+        <div class="chip-group">
+          <label class="chip"><input type="radio" name="duracao" value="30 minutos"> 30 min</label>
+          <label class="chip"><input type="radio" name="duracao" value="45 minutos"> 45 min</label>
+          <label class="chip"><input type="radio" name="duracao" value="60 minutos"> 60 min</label>
+          <label class="chip"><input type="radio" name="duracao" value="90 minutos"> 90 min</label>
+        </div>
+      </div>
+
+      <!-- STEP 4 — Restrições -->
+      <div class="step" id="step-4">
+        <p style="font-size:14px; font-weight:600; margin:0 0 6px">Você tem alguma restrição física ou lesão?</p>
+        <div class="chip-group">
+          <label class="chip"><input type="radio" name="restricao-tipo" value="Nenhuma restrição"> Nenhuma</label>
+          <label class="chip"><input type="radio" name="restricao-tipo" value="Sim, tenho restrições"> Sim, tenho restrições</label>
+        </div>
+        <div id="restricao-detalhe" style="display:none; margin-top:14px">
+          <label>Descreva suas restrições ou lesões</label>
+          <textarea id="a-restricao" placeholder="Ex: dor no joelho direito, hérnia lombar L4-L5, ombro operado..."></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 5 — Equipamentos -->
+      <div class="step" id="step-5">
+        <p style="font-size:14px; font-weight:600; margin:0 0 12px">Onde você vai treinar? (pode marcar mais de um)</p>
+        <div class="chip-group">
+          <label class="chip"><input type="checkbox" name="local" value="Academia completa (máquinas, pesos livres, cabos)"> Academia</label>
+          <label class="chip"><input type="checkbox" name="local" value="Casa com halteres e/ou barras"> Em casa (pesos)</label>
+          <label class="chip"><input type="checkbox" name="local" value="Casa sem equipamentos (peso corporal)"> Em casa (sem equipamento)</label>
+          <label class="chip"><input type="checkbox" name="local" value="Ao ar livre (parque, rua)"> Ao ar livre</label>
+        </div>
+        <label style="margin-top:16px">Alguma informação extra que queira passar? (opcional)</label>
+        <textarea id="a-obs" placeholder="Horário preferido, metas específicas, histórico médico relevante..."></textarea>
+      </div>
+
+      <div id="msg-anamnese" class="msg"></div>
+
+      <div class="step-nav">
+        <button class="sec" id="btn-step-back" style="display:none">← Voltar</button>
+        <button class="cta" id="btn-step-next" style="margin-top:0">Próximo →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ PAGAMENTO ═══════════════ -->
+  <div id="view-pagamento" class="view">
+    <div class="card">
+      <div class="eyebrow" style="color:var(--accent-dk)">Quase lá!</div>
+      <h1 class="title display">ATIVE SEU PLANO</h1>
+      <p class="sub">Pagamento único. Acesso vitalício ao seu treino personalizado.</p>
+
+      <div class="pay-card">
+        <div class="pay-price"><span>R$</span> 47<span style="font-size:18px">,90</span></div>
+        <p class="pay-desc">Pagamento único • Sem mensalidade</p>
+
+        <div class="pay-items">
+          <div class="pay-item">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#EAF7F0"/><path d="M4.5 8l2.5 2.5 4.5-4.5" stroke="#1B7A4B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Treino personalizado gerado por IA
+          </div>
+          <div class="pay-item">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#EAF7F0"/><path d="M4.5 8l2.5 2.5 4.5-4.5" stroke="#1B7A4B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Atualize sua ficha e regenere sempre que quiser
+          </div>
+          <div class="pay-item">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#EAF7F0"/><path d="M4.5 8l2.5 2.5 4.5-4.5" stroke="#1B7A4B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Acesso pelo celular, a qualquer hora
+          </div>
+        </div>
+      </div>
+
+      <button class="cta" id="btn-pagar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Pagar R$ 47,90 e ativar
+      </button>
+      <div id="msg-pagamento" class="msg"></div>
+      <p style="text-align:center; font-size:11px; color:var(--muted); margin-top:12px">🔒 Pagamento seguro • Esta é uma simulação</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════ PAINEL ═══════════════ -->
   <div id="view-painel" class="view">
     <div class="card">
       <div class="painel-top">
@@ -171,16 +392,96 @@
         </div>
         <button class="sair" id="btn-sair">Sair</button>
       </div>
-      <p class="sub" style="margin-top:6px">Seu acesso ao FitEvolution está ativo. Em breve, seu treino personalizado aparece aqui.</p>
 
-      <details style="margin-top:8px">
-        <summary style="cursor:pointer; font-weight:600; font-size:13px; color:var(--accent-dk)">Trocar minha senha</summary>
-        <label>Nova senha</label>
-        <input id="t-senha" type="password" placeholder="Nova senha" autocomplete="new-password" />
-        <label>Confirmar</label>
-        <input id="t-senha2" type="password" placeholder="Repita a senha" autocomplete="new-password" />
-        <button class="cta" id="btn-trocar" style="margin-top:14px">Atualizar senha</button>
-        <div id="msg-trocar" class="msg"></div>
+      <!-- Status -->
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; margin-bottom:4px">
+        <span class="badge pago" id="badge-status">✓ Acesso ativo</span>
+      </div>
+
+      <!-- Treino -->
+      <div class="treino-wrap">
+        <div class="treino-header">
+          <div class="display treino-title">SEU TREINO</div>
+          <button class="regenerar" id="btn-regenerar">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Regenerar
+          </button>
+        </div>
+        <div class="treino-content" id="treino-content">
+          <div class="treino-loading" id="treino-loading" style="display:none">
+            <div class="spinner"></div>
+            <span>Montando seu treino personalizado…</span>
+          </div>
+          <span id="treino-texto" style="display:none"></span>
+          <span id="treino-vazio" style="color:var(--muted)">Seu treino aparece aqui após o pagamento.</span>
+        </div>
+      </div>
+
+      <!-- Editar anamnese -->
+      <details class="acc" style="margin-top:6px" id="acc-anamnese">
+        <summary>Atualizar minha ficha</summary>
+        <div class="acc-body" style="padding-bottom:12px">
+          <p style="font-size:12px; color:var(--muted); margin:0 0 10px">Altere seus dados e clique em "Salvar e regenerar treino".</p>
+
+          <label>Objetivo</label>
+          <select id="edit-objetivo">
+            <option>Perda de peso / emagrecimento</option>
+            <option>Ganho de massa muscular (hipertrofia)</option>
+            <option>Condicionamento físico e saúde geral</option>
+            <option>Força e potência</option>
+            <option>Flexibilidade e mobilidade</option>
+            <option>Resistência (endurance)</option>
+          </select>
+
+          <label>Nível</label>
+          <select id="edit-nivel">
+            <option>Iniciante (menos de 6 meses treinando)</option>
+            <option>Intermediário (6 meses a 2 anos)</option>
+            <option>Avançado (mais de 2 anos com consistência)</option>
+          </select>
+
+          <div style="display:flex; gap:12px">
+            <div style="flex:1"><label>Peso (kg)</label><input id="edit-peso" type="number" /></div>
+            <div style="flex:1"><label>Altura (cm)</label><input id="edit-altura" type="number" /></div>
+          </div>
+
+          <label>Dias por semana</label>
+          <select id="edit-dias">
+            <option value="2">2 dias</option><option value="3">3 dias</option>
+            <option value="4">4 dias</option><option value="5">5 dias</option><option value="6">6 dias</option>
+          </select>
+
+          <label>Duração da sessão</label>
+          <select id="edit-duracao">
+            <option>30 minutos</option><option>45 minutos</option>
+            <option>60 minutos</option><option>90 minutos</option>
+          </select>
+
+          <label>Restrições / lesões</label>
+          <textarea id="edit-restricao" placeholder="Nenhuma"></textarea>
+
+          <label>Local de treino</label>
+          <textarea id="edit-local" placeholder="Academia, casa..."></textarea>
+
+          <label>Observações</label>
+          <textarea id="edit-obs" placeholder="Opcional"></textarea>
+
+          <button class="cta" id="btn-salvar-anamnese" style="margin-top:14px">Salvar e regenerar treino</button>
+          <div id="msg-edit-anamnese" class="msg"></div>
+        </div>
+      </details>
+
+      <!-- Trocar senha -->
+      <details class="acc">
+        <summary>Trocar minha senha</summary>
+        <div class="acc-body" style="padding-bottom:12px">
+          <label>Nova senha</label>
+          <input id="t-senha" type="password" placeholder="Nova senha" autocomplete="new-password" />
+          <label>Confirmar</label>
+          <input id="t-senha2" type="password" placeholder="Repita a senha" autocomplete="new-password" />
+          <button class="cta" id="btn-trocar" style="margin-top:14px">Atualizar senha</button>
+          <div id="msg-trocar" class="msg"></div>
+        </div>
       </details>
     </div>
   </div>
@@ -188,13 +489,13 @@
   <p class="foot">FitEvolution • Acesso seguro do aluno</p>
 </div>
 
-<!-- Configuração externa (mantida fora do código-fonte / .gitignore) -->
+<!-- config.js externo (mantido fora do git) -->
 <script src="config.js"></script>
 
 <script>
-/* ============================================================
-   CONFIGURAÇÃO — lida do config.js (window.FE_CONFIG)
-   ============================================================ */
+/* ═══════════════════════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════════════════════ */
 const CFG = window.FE_CONFIG;
 if(!CFG || !CFG.firebase){
   alert("Arquivo config.js não encontrado. Coloque-o na mesma pasta deste HTML.");
@@ -204,25 +505,23 @@ const EMAILJS_PUBLIC_KEY          = CFG.emailjs.publicKey;
 const EMAILJS_SERVICE_ID          = CFG.emailjs.serviceId;
 const EMAILJS_TEMPLATE_BOASVINDAS = CFG.emailjs.templateBoasVindas;
 const EMAILJS_TEMPLATE_RESET      = CFG.emailjs.templateReset;
+// Chave pública da Anthropic (para uso no browser — restrinja por domínio no console da Anthropic)
+const ANTHROPIC_KEY               = CFG.anthropicKey || "";
 
-/* ============================================================
-   INICIALIZAÇÃO
-   ============================================================ */
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const db    = firebase.firestore();
 const alunos = db.collection("alunos");
 emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
 const URL_SISTEMA = location.origin + location.pathname;
 
-/* ============================================================
+/* ═══════════════════════════════════════════════════════════
    HELPERS
-   ============================================================ */
-// localStorage tolerante (não quebra em ambientes restritos)
+═══════════════════════════════════════════════════════════ */
 const LS = {
-  get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
-  set(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
-  del(k){ try { localStorage.removeItem(k); } catch(e){} }
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
 };
 
 async function hash(txt){
@@ -234,285 +533,566 @@ function soDigitos(s){ return (s||"").replace(/\D/g,""); }
 
 function cpfValido(cpf){
   cpf = soDigitos(cpf);
-  if(cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
-  let s=0; for(let i=0;i<9;i++) s += parseInt(cpf[i])*(10-i);
-  let d1=(s*10)%11; if(d1===10) d1=0; if(d1 !== parseInt(cpf[9])) return false;
-  s=0; for(let i=0;i<10;i++) s += parseInt(cpf[i])*(11-i);
-  let d2=(s*10)%11; if(d2===10) d2=0; return d2 === parseInt(cpf[10]);
+  if(cpf.length!==11 || /^(\d)\1{10}$/.test(cpf)) return false;
+  let s=0; for(let i=0;i<9;i++) s+=parseInt(cpf[i])*(10-i);
+  let d1=(s*10)%11; if(d1===10)d1=0; if(d1!==parseInt(cpf[9]))return false;
+  s=0; for(let i=0;i<10;i++) s+=parseInt(cpf[i])*(11-i);
+  let d2=(s*10)%11; if(d2===10)d2=0; return d2===parseInt(cpf[10]);
 }
 
 function emailValido(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
 function mascaraCPF(v){
-  v = soDigitos(v).slice(0,11);
+  v=soDigitos(v).slice(0,11);
   return v.replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d)/,"$1.$2").replace(/(\d{3})(\d{1,2})$/,"$1-$2");
 }
 
 function token(){
-  const a = new Uint8Array(16); crypto.getRandomValues(a);
-  return [...a].map(b => b.toString(16).padStart(2,"0")).join("");
+  const a=new Uint8Array(16); crypto.getRandomValues(a);
+  return [...a].map(b=>b.toString(16).padStart(2,"0")).join("");
 }
 
 function $(id){ return document.getElementById(id); }
 
 function showView(name){
-  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-  $("view-" + name).classList.add("active");
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  $("view-"+name).classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
-function msg(id, texto, tipo){
-  const el = $(id);
-  el.textContent = texto;
-  el.className = "msg show " + (tipo || "");
+function msg(id,texto,tipo){
+  const el=$(id); el.textContent=texto;
+  el.className="msg show "+(tipo||"");
 }
-function limpaMsg(id){ $(id).className = "msg"; }
+function limpaMsg(id){ $(id).className="msg"; }
 
-function carregando(btn, on, textoOriginal){
-  btn.disabled = on;
-  if(on){ btn.dataset.txt = btn.textContent; btn.textContent = "Aguarde..."; }
-  else  { btn.textContent = btn.dataset.txt || textoOriginal; }
+function carregando(btn,on){
+  btn.disabled=on;
+  if(on){ btn.dataset.txt=btn.textContent; btn.textContent="Aguarde…"; }
+  else{ btn.textContent=btn.dataset.txt||"OK"; }
 }
 
-/* ============================================================
+/* ═══════════════════════════════════════════════════════════
    CRIAR ACESSO
-   ============================================================ */
+═══════════════════════════════════════════════════════════ */
 async function criarAcesso(){
-  const btn = $("btn-criar");
-  limpaMsg("msg-criar");
-  const nome = $("c-nome").value.trim();
-  const cpf  = soDigitos($("c-cpf").value);
-  const nasc = $("c-nasc").value;
-  const email = $("c-email").value.trim().toLowerCase();
+  const btn=$("btn-criar"); limpaMsg("msg-criar");
+  const nome=$("c-nome").value.trim();
+  const cpf=soDigitos($("c-cpf").value);
+  const nasc=$("c-nasc").value;
+  const email=$("c-email").value.trim().toLowerCase();
 
-  if(!nome || nome.split(" ").length < 2) return msg("msg-criar","Informe o nome completo.","err");
-  if(!cpfValido(cpf)) return msg("msg-criar","CPF inválido. Confira os números.","err");
+  if(!nome || nome.split(" ").length<2) return msg("msg-criar","Informe o nome completo.","err");
+  if(!cpfValido(cpf)) return msg("msg-criar","CPF inválido.","err");
   if(!nasc) return msg("msg-criar","Informe a data de nascimento.","err");
   if(!emailValido(email)) return msg("msg-criar","E-mail inválido.","err");
 
-  carregando(btn, true);
-  try {
-    // CPF é o identificador (evita duplicidade)
-    const ref = alunos.doc(cpf);
-    if((await ref.get()).exists) { carregando(btn,false); return msg("msg-criar","Já existe um acesso com este CPF.","err"); }
-    // e-mail único
-    const dupEmail = await alunos.where("email","==",email).limit(1).get();
-    if(!dupEmail.empty) { carregando(btn,false); return msg("msg-criar","Este e-mail já está em uso.","err"); }
+  carregando(btn,true);
+  try{
+    const ref=alunos.doc(cpf);
+    if((await ref.get()).exists){ carregando(btn,false); return msg("msg-criar","Já existe um acesso com este CPF.","err"); }
+    const dupEmail=await alunos.where("email","==",email).limit(1).get();
+    if(!dupEmail.empty){ carregando(btn,false); return msg("msg-criar","Este e-mail já está em uso.","err"); }
 
-    // Senha inicial = CPF (somente números). Guardamos só o hash.
-    const senhaInicial = cpf;
+    const senhaInicial=cpf;
     await ref.set({
-      nome, cpf, dataNascimento: nasc, email,
+      nome, cpf, dataNascimento:nasc, email,
       senhaHash: await hash(senhaInicial),
-      senhaPadraoCpf: true,
-      ativo: true,
+      senhaPadraoCpf:true, ativo:true,
+      anamnese:false, pago:false,
       criadoEm: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // E-mail de boas-vindas com a senha (se falhar, desfaz o cadastro p/ permitir nova tentativa)
-    try {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_BOASVINDAS, {
-        to_name: nome,
-        to_email: email,
-        login_email: email,
-        senha: senhaInicial,        // CPF, somente números
-        link_sistema: URL_SISTEMA
+    try{
+      await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_BOASVINDAS,{
+        to_name:nome, to_email:email,
+        login_email:email, senha:senhaInicial,
+        link_sistema:URL_SISTEMA
       });
-    } catch(mailErr){
-      console.error("Falha no EmailJS:", mailErr);
-      await ref.delete().catch(() => {});
+    }catch(mailErr){
+      console.error("Falha EmailJS:",mailErr);
+      await ref.delete().catch(()=>{});
       carregando(btn,false);
-      return msg("msg-criar","Cadastro não concluído: falha ao enviar o e-mail. Confira o template no EmailJS e tente novamente.","err");
+      return msg("msg-criar","Cadastro não concluído: falha ao enviar e-mail.","err");
     }
 
     carregando(btn,false);
-    msg("msg-criar","Acesso criado! Enviamos sua senha para " + email + ".","ok");
-    ["c-nome","c-cpf","c-nasc","c-email"].forEach(i => $(i).value = "");
-    setTimeout(() => showView("login"), 2200);
-  } catch(err){
-    console.error(err);
-    carregando(btn,false);
+    msg("msg-criar","Acesso criado! Enviamos sua senha para "+email+".","ok");
+    ["c-nome","c-cpf","c-nasc","c-email"].forEach(i=>$(i).value="");
+    setTimeout(()=>showView("login"),2200);
+  }catch(err){
+    console.error(err); carregando(btn,false);
     msg("msg-criar","Erro ao criar acesso. Tente novamente.","err");
   }
 }
 
-/* ============================================================
+/* ═══════════════════════════════════════════════════════════
    LOGIN
-   ============================================================ */
+═══════════════════════════════════════════════════════════ */
 async function entrar(){
-  const btn = $("btn-login");
-  limpaMsg("msg-login");
-  const email = $("login-email").value.trim().toLowerCase();
-  const senha = $("login-senha").value;
-  if(!emailValido(email) || !senha) return msg("msg-login","Informe e-mail e senha.","err");
+  const btn=$("btn-login"); limpaMsg("msg-login");
+  const email=$("login-email").value.trim().toLowerCase();
+  const senha=$("login-senha").value;
+  if(!emailValido(email)||!senha) return msg("msg-login","Informe e-mail e senha.","err");
 
-  carregando(btn, true);
-  try {
-    const q = await alunos.where("email","==",email).limit(1).get();
+  carregando(btn,true);
+  try{
+    const q=await alunos.where("email","==",email).limit(1).get();
     if(q.empty){ carregando(btn,false); return msg("msg-login","E-mail ou senha incorretos.","err"); }
-    const doc = q.docs[0];
-    const dados = doc.data();
-    if(dados.senhaHash !== await hash(senha)){ carregando(btn,false); return msg("msg-login","E-mail ou senha incorretos.","err"); }
-    if(dados.ativo === false){ carregando(btn,false); return msg("msg-login","Acesso desativado. Procure a recepção.","err"); }
+    const doc=q.docs[0]; const dados=doc.data();
+    if(dados.senhaHash!==await hash(senha)){ carregando(btn,false); return msg("msg-login","E-mail ou senha incorretos.","err"); }
+    if(dados.ativo===false){ carregando(btn,false); return msg("msg-login","Acesso desativado. Procure a recepção.","err"); }
 
-    if($("login-auto").checked) LS.set("fe_sessao", doc.id);
+    if($("login-auto").checked) LS.set("fe_sessao",doc.id);
     carregando(btn,false);
-    abrirPainel(dados);
-  } catch(err){
-    console.error(err);
-    carregando(btn,false);
+    roteiarAposLogin(dados);
+  }catch(err){
+    console.error(err); carregando(btn,false);
     msg("msg-login","Erro ao entrar. Tente novamente.","err");
   }
 }
 
-function abrirPainel(dados){
-  $("p-nome").textContent = (dados.nome || "aluno").split(" ")[0].toUpperCase();
-  window._alunoAtual = dados;
-  showView("painel");
+/* Decide para onde mandar o aluno após login/sessão */
+function roteiarAposLogin(dados){
+  window._alunoAtual=dados;
+  if(!dados.anamnese){
+    iniciarAnamnese();
+    return;
+  }
+  if(!dados.pago){
+    showView("pagamento");
+    return;
+  }
+  abrirPainel(dados);
 }
 
 function sair(){
   LS.del("fe_sessao");
-  window._alunoAtual = null;
-  $("login-senha").value = "";
+  window._alunoAtual=null;
+  $("login-senha").value="";
   showView("login");
 }
 
-/* ============================================================
-   ESQUECI A SENHA → envia link via EmailJS
-   ============================================================ */
-async function enviarReset(){
-  const btn = $("btn-esqueci");
-  limpaMsg("msg-esqueci");
-  const email = $("e-email").value.trim().toLowerCase();
-  if(!emailValido(email)) return msg("msg-esqueci","E-mail inválido.","err");
+/* ═══════════════════════════════════════════════════════════
+   ANAMNESE — stepper
+═══════════════════════════════════════════════════════════ */
+let currentStep=1;
+const TOTAL_STEPS=5;
+const STEP_NAMES=["Objetivo","Nível","Disponibilidade","Restrições","Equipamentos"];
 
-  carregando(btn, true);
-  try {
-    const q = await alunos.where("email","==",email).limit(1).get();
+function iniciarAnamnese(){
+  currentStep=1;
+  atualizarStep();
+  showView("anamnese");
+}
+
+function atualizarStep(){
+  for(let i=1;i<=TOTAL_STEPS;i++){
+    $(`step-${i}`)?.classList.remove("active");
+  }
+  $(`step-${currentStep}`)?.classList.add("active");
+
+  $("step-label").textContent=`Etapa ${currentStep} de ${TOTAL_STEPS}`;
+  $("step-name").textContent=STEP_NAMES[currentStep-1];
+  $("prog-fill").style.width=`${(currentStep/TOTAL_STEPS)*100}%`;
+
+  $("btn-step-back").style.display = currentStep>1 ? "block" : "none";
+  $("btn-step-next").textContent = currentStep===TOTAL_STEPS ? "Salvar ficha →" : "Próximo →";
+  limpaMsg("msg-anamnese");
+}
+
+function validarStep(n){
+  if(n===1){
+    const v=document.querySelector('input[name="objetivo"]:checked');
+    if(!v){ msg("msg-anamnese","Selecione seu objetivo.","err"); return false; }
+  }
+  if(n===2){
+    const v=document.querySelector('input[name="nivel"]:checked');
+    if(!v){ msg("msg-anamnese","Selecione seu nível de experiência.","err"); return false; }
+  }
+  if(n===3){
+    const v=document.querySelector('input[name="duracao"]:checked');
+    if(!v){ msg("msg-anamnese","Selecione a duração da sessão.","err"); return false; }
+  }
+  if(n===4){
+    const v=document.querySelector('input[name="restricao-tipo"]:checked');
+    if(!v){ msg("msg-anamnese","Indique se tem restrições físicas.","err"); return false; }
+  }
+  if(n===5){
+    const checks=[...document.querySelectorAll('input[name="local"]:checked')];
+    if(!checks.length){ msg("msg-anamnese","Selecione pelo menos um local de treino.","err"); return false; }
+  }
+  return true;
+}
+
+$("btn-step-next").addEventListener("click",async()=>{
+  if(!validarStep(currentStep)) return;
+  if(currentStep<TOTAL_STEPS){ currentStep++; atualizarStep(); return; }
+  // Último step — salvar
+  await salvarAnamnese();
+});
+$("btn-step-back").addEventListener("click",()=>{
+  if(currentStep>1){ currentStep--; atualizarStep(); }
+});
+
+// Range label
+$("a-dias").addEventListener("input",e=>{
+  $("dias-label").textContent=`${e.target.value} dias por semana`;
+});
+
+// Mostrar/ocultar campo de restrição
+document.querySelectorAll('input[name="restricao-tipo"]').forEach(r=>{
+  r.addEventListener("change",()=>{
+    $("restricao-detalhe").style.display=
+      document.querySelector('input[name="restricao-tipo"]:checked')?.value==="Sim, tenho restrições"
+        ? "block" : "none";
+  });
+});
+
+async function salvarAnamnese(){
+  const btn=$("btn-step-next");
+  limpaMsg("msg-anamnese");
+  const dados = coletarAnamnese();
+  carregando(btn,true);
+  try{
+    await alunos.doc(window._alunoAtual.cpf).update({ anamnese:dados, anamneseFinalizada:true });
+    window._alunoAtual.anamnese=dados;
+    window._alunoAtual.anamneseFinalizada=true;
+    carregando(btn,false);
+    showView("pagamento");
+  }catch(err){
+    console.error(err); carregando(btn,false);
+    msg("msg-anamnese","Erro ao salvar ficha. Tente novamente.","err");
+  }
+}
+
+function coletarAnamnese(){
+  const objetivo=document.querySelector('input[name="objetivo"]:checked')?.value||"";
+  const nivel=document.querySelector('input[name="nivel"]:checked')?.value||"";
+  const peso=$("a-peso").value;
+  const altura=$("a-altura").value;
+  const dias=$("a-dias").value;
+  const duracao=document.querySelector('input[name="duracao"]:checked')?.value||"";
+  const restricaoTipo=document.querySelector('input[name="restricao-tipo"]:checked')?.value||"Nenhuma restrição";
+  const restricaoDetalhe=restricaoTipo==="Sim, tenho restrições" ? ($("a-restricao").value||"") : "";
+  const locais=[...document.querySelectorAll('input[name="local"]:checked')].map(c=>c.value);
+  const obs=$("a-obs").value;
+  return { objetivo, nivel, peso, altura, dias, duracao, restricaoTipo, restricaoDetalhe, locais, obs };
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PAGAMENTO SIMULADO
+═══════════════════════════════════════════════════════════ */
+$("btn-pagar").addEventListener("click", async()=>{
+  const btn=$("btn-pagar"); limpaMsg("msg-pagamento");
+  carregando(btn,true);
+  // Simula ~1.5 s de processamento
+  await new Promise(r=>setTimeout(r,1500));
+  try{
+    await alunos.doc(window._alunoAtual.cpf).update({
+      pago:true,
+      pagamentoEm: firebase.firestore.FieldValue.serverTimestamp(),
+      pagamentoRef: "SIM-"+token().slice(0,8).toUpperCase()
+    });
+    window._alunoAtual.pago=true;
+    carregando(btn,false);
+    msg("msg-pagamento","Pagamento confirmado! ✓ Redirecionando…","ok");
+    setTimeout(()=> abrirPainel(window._alunoAtual), 1200);
+  }catch(err){
+    console.error(err); carregando(btn,false);
+    msg("msg-pagamento","Erro ao registrar pagamento. Tente novamente.","err");
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   PAINEL
+═══════════════════════════════════════════════════════════ */
+function abrirPainel(dados){
+  $("p-nome").textContent=(dados.nome||"aluno").split(" ")[0].toUpperCase();
+  window._alunoAtual=dados;
+  preencherEditAnamnese(dados.anamnese||{});
+  showView("painel");
+
+  // Carregar treino: se já existe no Firestore, exibe; senão, gera
+  if(dados.treinoGerado){
+    exibirTreino(dados.treinoGerado);
+  } else if(dados.pago && dados.anamnese){
+    gerarTreino(dados.anamnese);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TREINO — Anthropic API
+═══════════════════════════════════════════════════════════ */
+function exibirTreino(texto){
+  $("treino-loading").style.display="none";
+  $("treino-vazio").style.display="none";
+  $("treino-texto").style.display="block";
+  $("treino-texto").textContent=texto;
+}
+
+async function gerarTreino(anamnese){
+  $("treino-vazio").style.display="none";
+  $("treino-loading").style.display="flex";
+  $("treino-texto").style.display="none";
+
+  const prompt = montarPrompt(anamnese);
+
+  try{
+    const resp = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key": ANTHROPIC_KEY,
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
+      body: JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1500,
+        system:`Você é um personal trainer especialista em prescrição de exercícios.
+Crie treinos completos, seguros e adequados ao perfil do aluno.
+Responda SOMENTE com o plano de treino formatado, sem saudações ou explicações adicionais.
+Use seções claras com dias, exercícios, séries, repetições e tempo de descanso.
+Use emojis de forma discreta para tornar o treino mais visual.`,
+        messages:[{ role:"user", content:prompt }]
+      })
+    });
+
+    if(!resp.ok){
+      const e=await resp.json().catch(()=>({}));
+      throw new Error(e?.error?.message || `HTTP ${resp.status}`);
+    }
+
+    const data=await resp.json();
+    const texto=data.content?.[0]?.text||"Não foi possível gerar o treino.";
+
+    // Salva no Firestore para não repetir a chamada desnecessariamente
+    await alunos.doc(window._alunoAtual.cpf).update({ treinoGerado:texto });
+    window._alunoAtual.treinoGerado=texto;
+
+    exibirTreino(texto);
+  }catch(err){
+    console.error("Erro Anthropic:",err);
+    $("treino-loading").style.display="none";
+    $("treino-vazio").style.display="block";
+    $("treino-vazio").textContent="Não foi possível gerar o treino agora: "+err.message;
+    $("treino-vazio").style.color="var(--err)";
+  }
+}
+
+function montarPrompt(a){
+  const locais=(a.locais||[]).join(", ")||a.local||"não informado";
+  const restricao = a.restricaoTipo==="Nenhuma restrição" || !a.restricaoTipo
+    ? "Nenhuma restrição relatada"
+    : `${a.restricaoTipo}${a.restricaoDetalhe ? ": "+a.restricaoDetalhe : ""}`;
+
+  return `Monte um plano de treino COMPLETO e PERSONALIZADO com base no perfil abaixo:
+
+🎯 Objetivo: ${a.objetivo||"não informado"}
+📊 Nível: ${a.nivel||"não informado"}
+⚖️ Peso: ${a.peso||"?"}kg | Altura: ${a.altura||"?"}cm
+📅 Frequência: ${a.dias||"3"} dias por semana
+⏱ Duração: ${a.duracao||"60 minutos"} por sessão
+🏋️ Local / equipamentos: ${locais}
+🚫 Restrições: ${restricao}
+📝 Observações: ${a.obs||"Nenhuma"}
+
+O treino deve:
+- Estar dividido pelos dias da semana disponíveis
+- Incluir aquecimento, treino principal e alongamento
+- Especificar séries, repetições/tempo e descanso para cada exercício
+- Respeitar as restrições físicas mencionadas
+- Ser progressivo e adequado ao nível indicado`;
+}
+
+// Botão regenerar
+$("btn-regenerar").addEventListener("click",async()=>{
+  const dados=window._alunoAtual;
+  if(!dados?.anamnese){ return; }
+  // Força nova geração
+  await alunos.doc(dados.cpf).update({ treinoGerado:firebase.firestore.FieldValue.delete() });
+  window._alunoAtual.treinoGerado=null;
+  gerarTreino(dados.anamnese);
+});
+
+/* ═══════════════════════════════════════════════════════════
+   EDITAR ANAMNESE (no painel)
+═══════════════════════════════════════════════════════════ */
+function preencherEditAnamnese(a){
+  if(!a) return;
+  const sel=(id,val)=>{ const el=$(id); if(el && val) el.value=val; };
+  sel("edit-objetivo",a.objetivo);
+  sel("edit-nivel",a.nivel);
+  sel("edit-peso",a.peso);
+  sel("edit-altura",a.altura);
+  sel("edit-dias",a.dias);
+  sel("edit-duracao",a.duracao);
+  $("edit-restricao").value=[a.restricaoTipo, a.restricaoDetalhe].filter(Boolean).join(": ");
+  $("edit-local").value=(a.locais||[]).join(", ")||a.local||"";
+  $("edit-obs").value=a.obs||"";
+}
+
+$("btn-salvar-anamnese").addEventListener("click",async()=>{
+  const btn=$("btn-salvar-anamnese"); limpaMsg("msg-edit-anamnese");
+  const novaAnamnese={
+    objetivo:$("edit-objetivo").value,
+    nivel:$("edit-nivel").value,
+    peso:$("edit-peso").value,
+    altura:$("edit-altura").value,
+    dias:$("edit-dias").value,
+    duracao:$("edit-duracao").value,
+    restricaoTipo:$("edit-restricao").value||"Nenhuma restrição",
+    restricaoDetalhe:"",
+    local:$("edit-local").value,
+    locais:$("edit-local").value.split(",").map(s=>s.trim()).filter(Boolean),
+    obs:$("edit-obs").value
+  };
+  carregando(btn,true);
+  try{
+    await alunos.doc(window._alunoAtual.cpf).update({
+      anamnese:novaAnamnese,
+      treinoGerado:firebase.firestore.FieldValue.delete()
+    });
+    window._alunoAtual.anamnese=novaAnamnese;
+    window._alunoAtual.treinoGerado=null;
+    carregando(btn,false);
+    msg("msg-edit-anamnese","Ficha salva! Gerando novo treino…","ok");
+    $("acc-anamnese").open=false;
+    gerarTreino(novaAnamnese);
+  }catch(err){
+    console.error(err); carregando(btn,false);
+    msg("msg-edit-anamnese","Erro ao salvar. Tente novamente.","err");
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   TROCAR SENHA
+═══════════════════════════════════════════════════════════ */
+$("btn-trocar").addEventListener("click",async()=>{
+  const btn=$("btn-trocar"); limpaMsg("msg-trocar");
+  const s1=$("t-senha").value, s2=$("t-senha2").value;
+  if(!window._alunoAtual) return;
+  if(s1.length<6) return msg("msg-trocar","Mínimo de 6 caracteres.","err");
+  if(s1!==s2) return msg("msg-trocar","As senhas não conferem.","err");
+  carregando(btn,true);
+  try{
+    await alunos.doc(window._alunoAtual.cpf).update({ senhaHash:await hash(s1), senhaPadraoCpf:false });
+    carregando(btn,false);
+    msg("msg-trocar","Senha atualizada com sucesso.","ok");
+    $("t-senha").value=$("t-senha2").value="";
+  }catch(err){
+    console.error(err); carregando(btn,false);
+    msg("msg-trocar","Erro ao atualizar. Tente novamente.","err");
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   ESQUECI / RESET
+═══════════════════════════════════════════════════════════ */
+async function enviarReset(){
+  const btn=$("btn-esqueci"); limpaMsg("msg-esqueci");
+  const email=$("e-email").value.trim().toLowerCase();
+  if(!emailValido(email)) return msg("msg-esqueci","E-mail inválido.","err");
+  carregando(btn,true);
+  try{
+    const q=await alunos.where("email","==",email).limit(1).get();
     if(!q.empty){
-      const doc = q.docs[0];
-      const tk = token();
-      const expira = Date.now() + 60*60*1000; // 1 hora
-      await doc.ref.update({ resetToken: tk, resetExpira: expira });
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_RESET, {
-        to_name: doc.data().nome,
-        to_email: email,
-        link_reset: URL_SISTEMA + "?reset=" + tk
+      const doc=q.docs[0];
+      const tk=token(); const expira=Date.now()+60*60*1000;
+      await doc.ref.update({ resetToken:tk, resetExpira:expira });
+      await emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_RESET,{
+        to_name:doc.data().nome, to_email:email,
+        link_reset:URL_SISTEMA+"?reset="+tk
       });
     }
-    // Mensagem genérica (não revela se o e-mail existe)
     carregando(btn,false);
     msg("msg-esqueci","Se este e-mail estiver cadastrado, enviamos um link de redefinição.","ok");
-  } catch(err){
-    console.error(err);
-    carregando(btn,false);
+  }catch(err){
+    console.error(err); carregando(btn,false);
     msg("msg-esqueci","Erro ao enviar. Tente novamente.","err");
   }
 }
 
-/* ============================================================
-   REDEFINIR SENHA (via link com ?reset=TOKEN)
-   ============================================================ */
-let _resetToken = null;
+let _resetToken=null;
 
 async function redefinirSenha(){
-  const btn = $("btn-reset");
-  limpaMsg("msg-reset");
-  const s1 = $("r-senha").value, s2 = $("r-senha2").value;
-  if(s1.length < 6) return msg("msg-reset","A senha deve ter ao menos 6 caracteres.","err");
-  if(s1 !== s2) return msg("msg-reset","As senhas não conferem.","err");
-
-  carregando(btn, true);
-  try {
-    const q = await alunos.where("resetToken","==",_resetToken).limit(1).get();
+  const btn=$("btn-reset"); limpaMsg("msg-reset");
+  const s1=$("r-senha").value, s2=$("r-senha2").value;
+  if(s1.length<6) return msg("msg-reset","Mínimo de 6 caracteres.","err");
+  if(s1!==s2) return msg("msg-reset","As senhas não conferem.","err");
+  carregando(btn,true);
+  try{
+    const q=await alunos.where("resetToken","==",_resetToken).limit(1).get();
     if(q.empty){ carregando(btn,false); return msg("msg-reset","Link inválido. Solicite um novo.","err"); }
-    const doc = q.docs[0];
-    if(!doc.data().resetExpira || doc.data().resetExpira < Date.now()){
+    const doc=q.docs[0];
+    if(!doc.data().resetExpira||doc.data().resetExpira<Date.now()){
       carregando(btn,false); return msg("msg-reset","Link expirado. Solicite um novo.","err");
     }
     await doc.ref.update({
-      senhaHash: await hash(s1),
-      senhaPadraoCpf: false,
-      resetToken: firebase.firestore.FieldValue.delete(),
-      resetExpira: firebase.firestore.FieldValue.delete()
+      senhaHash:await hash(s1), senhaPadraoCpf:false,
+      resetToken:firebase.firestore.FieldValue.delete(),
+      resetExpira:firebase.firestore.FieldValue.delete()
     });
     carregando(btn,false);
     msg("msg-reset","Senha atualizada! Você já pode entrar.","ok");
     history.replaceState(null,"",URL_SISTEMA);
-    setTimeout(() => showView("login"), 2000);
-  } catch(err){
-    console.error(err);
-    carregando(btn,false);
+    setTimeout(()=>showView("login"),2000);
+  }catch(err){
+    console.error(err); carregando(btn,false);
     msg("msg-reset","Erro ao salvar. Tente novamente.","err");
   }
 }
 
-/* ============================================================
-   TROCAR SENHA (logado)
-   ============================================================ */
-async function trocarSenha(){
-  const btn = $("btn-trocar");
-  limpaMsg("msg-trocar");
-  const s1 = $("t-senha").value, s2 = $("t-senha2").value;
-  if(!window._alunoAtual) return;
-  if(s1.length < 6) return msg("msg-trocar","A senha deve ter ao menos 6 caracteres.","err");
-  if(s1 !== s2) return msg("msg-trocar","As senhas não conferem.","err");
-  carregando(btn, true);
-  try {
-    await alunos.doc(window._alunoAtual.cpf).update({ senhaHash: await hash(s1), senhaPadraoCpf:false });
-    carregando(btn,false);
-    msg("msg-trocar","Senha atualizada com sucesso.","ok");
-    $("t-senha").value = $("t-senha2").value = "";
-  } catch(err){
-    console.error(err);
-    carregando(btn,false);
-    msg("msg-trocar","Erro ao atualizar. Tente novamente.","err");
-  }
-}
-
-/* ============================================================
+/* ═══════════════════════════════════════════════════════════
    ROTEAMENTO INICIAL + EVENTOS
-   ============================================================ */
+═══════════════════════════════════════════════════════════ */
 async function init(){
-  // Link de reset?
-  const params = new URLSearchParams(location.search);
-  const tk = params.get("reset");
-  if(tk){ _resetToken = tk; showView("reset"); return; }
+  const params=new URLSearchParams(location.search);
+  const tk=params.get("reset");
+  if(tk){ _resetToken=tk; showView("reset"); return; }
 
-  // Login automático?
-  const sessao = LS.get("fe_sessao");
+  const sessao=LS.get("fe_sessao");
   if(sessao){
-    try {
-      const snap = await alunos.doc(sessao).get();
-      if(snap.exists && snap.data().ativo !== false){ abrirPainel(snap.data()); return; }
+    try{
+      const snap=await alunos.doc(sessao).get();
+      if(snap.exists && snap.data().ativo!==false){
+        roteiarAposLogin(snap.data()); return;
+      }
       LS.del("fe_sessao");
-    } catch(e){ /* segue para login */ }
+    }catch(e){ /* segue para login */ }
   }
   showView("login");
 }
 
-// Navegação entre telas
-document.querySelectorAll("[data-go]").forEach(a =>
-  a.addEventListener("click", () => { limpaMsgs(); showView(a.dataset.go); })
+// Navegação entre telas (links data-go)
+document.querySelectorAll("[data-go]").forEach(a=>
+  a.addEventListener("click",()=>{
+    ["msg-login","msg-criar","msg-esqueci","msg-reset"].forEach(limpaMsg);
+    showView(a.dataset.go);
+  })
 );
-function limpaMsgs(){ ["msg-login","msg-criar","msg-esqueci","msg-reset"].forEach(limpaMsg); }
 
-// Máscara de CPF
-$("c-cpf").addEventListener("input", e => { e.target.value = mascaraCPF(e.target.value); });
+// Máscara CPF
+$("c-cpf").addEventListener("input",e=>{ e.target.value=mascaraCPF(e.target.value); });
 
 // Botões
-$("btn-criar").addEventListener("click", criarAcesso);
-$("btn-login").addEventListener("click", entrar);
-$("btn-esqueci").addEventListener("click", enviarReset);
-$("btn-reset").addEventListener("click", redefinirSenha);
-$("btn-trocar").addEventListener("click", trocarSenha);
-$("btn-sair").addEventListener("click", sair);
+$("btn-criar").addEventListener("click",criarAcesso);
+$("btn-login").addEventListener("click",entrar);
+$("btn-esqueci").addEventListener("click",enviarReset);
+$("btn-reset").addEventListener("click",redefinirSenha);
+$("btn-sair").addEventListener("click",sair);
 
-// Enter envia o formulário da tela ativa
-document.addEventListener("keydown", e => {
-  if(e.key !== "Enter") return;
-  const v = document.querySelector(".view.active").id;
-  ({ "view-login":entrar, "view-criar":criarAcesso, "view-esqueci":enviarReset, "view-reset":redefinirSenha })[v]?.();
+// Enter
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Enter") return;
+  const v=document.querySelector(".view.active")?.id;
+  ({
+    "view-login":entrar,
+    "view-criar":criarAcesso,
+    "view-esqueci":enviarReset,
+    "view-reset":redefinirSenha
+  })[v]?.();
 });
 
 init();
